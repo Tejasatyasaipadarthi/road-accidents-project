@@ -1,0 +1,26 @@
+{
+    "target_column": "Accident_Severity_C",
+    "feature_columns": [
+        "Date",
+        "Day_of_Week",
+        "Time_of_Accident",
+        "Accident_Location_A",
+        "Accident_Location_A_Chainage_km",
+        "Accident_Location_A_Chainage_km_RoadSide",
+        "Causes_D",
+        "Road_Feature_E",
+        "Road_Condition_F",
+        "Weather_Conditions_H",
+        "Vehicle_Type_Involved_J_V1",
+        "Vehicle_Type_Involved_J_V2"
+    ],
+    "classes": [
+        "1",
+        "2",
+        "3",
+        "4"
+    ],
+    "accuracy": 0.46979038224414305,
+    "training_rows": 3242,
+    "testing_rows": 811
+}

@@ -11,13 +11,13 @@ import streamlit as st
 # PROJECT PATHS
 # --------------------------------------------------
 PROJECT_DIR = Path(__file__).resolve().parent
-DATA_FILE = PROJECT_DIR.parent / "data" / "accidents.csv"
-MODEL_FILE = PROJECT_DIR.parent / "models" / "random_forest_model.pkl"
+DATA_FILE = PROJECT_DIR / "data" / "accidents.csv"
+MODEL_FILE = PROJECT_DIR / "models" / "random_forest_model.pkl"
 METADATA_FILE = (
-    PROJECT_DIR.parent / "outputs" / "reports" / "model_metadata.json"
+    PROJECT_DIR / "outputs" / "reports" / "model_metadata.json"
 )
 REPORT_FILE = (
-    PROJECT_DIR.parent / "outputs" / "reports" / "classification_report.json"
+    PROJECT_DIR / "outputs" / "reports" / "classification_report.json"
 )
 
 st.set_page_config(
@@ -51,11 +51,14 @@ st.caption(
 missing_files = [
     str(path)
     for path in [DATA_FILE, MODEL_FILE]
-    if not path.exists()
+    if not path.is_file()
 ]
 
 if missing_files:
-    st.error("Required project files were not found:")
+    st.error(
+        "Required project files were not found in this repository. "
+        "Include the data/ and models/ folders alongside app.py:"
+    )
     for file_path in missing_files:
         st.write(file_path)
     st.stop()
@@ -67,6 +70,37 @@ try:
     report = load_json(REPORT_FILE)
 except Exception as error:
     st.error(f"Unable to load project files: {error}")
+    st.stop()
+
+target = metadata.get("target_column", "Accident_Severity_C")
+if target != "Accident_Severity_C":
+    st.error(
+        "Model metadata must use the original target column "
+        "'Accident_Severity_C'."
+    )
+    st.stop()
+
+if target not in df.columns:
+    st.error(f"Severity column '{target}' was not found in the dataset.")
+    st.stop()
+
+feature_columns = metadata.get("feature_columns", [])
+missing_features = [
+    feature for feature in feature_columns if feature not in df.columns
+]
+if not feature_columns or missing_features:
+    st.error(
+        "Model feature metadata does not match the dataset. "
+        f"Missing features: {missing_features or 'feature list is empty'}"
+    )
+    st.stop()
+
+model_features = getattr(model, "feature_names_in_", None)
+if model_features is not None and list(model_features) != feature_columns:
+    st.error(
+        "The saved model feature order does not match model_metadata.json. "
+        "Use the matching trained model and metadata files."
+    )
     st.stop()
 
 # --------------------------------------------------
@@ -91,12 +125,6 @@ st.sidebar.write("Algorithm: Random Forest")
 # --------------------------------------------------
 if page == "Home Dashboard":
     st.header("Accident Analytics Dashboard")
-
-    target = metadata.get("target_column", "Accident_Severity_C")
-
-    if target not in df.columns:
-        st.error(f"Severity column '{target}' was not found in the dataset.")
-        st.stop()
 
     severity_data = df[target].dropna()
     total_records = len(df)
@@ -184,13 +212,6 @@ elif page == "Severity Prediction":
         "Enter the accident details below. "
         "The trained Random Forest model will predict the severity class."
     )
-
-    feature_columns = metadata.get("feature_columns", [])
-    target = metadata.get("target_column", "Accident_Severity_C")
-
-    if not feature_columns:
-        st.error("Model feature information is missing from metadata.")
-        st.stop()
 
     inputs = {}
 

@@ -18,9 +18,9 @@ from sklearn.metrics import (
 
 # Project paths
 PROJECT_DIR = Path(__file__).resolve().parent
-DATA_FILE = PROJECT_DIR.parent / "data" / "accidents.csv"
-MODEL_DIR = PROJECT_DIR.parent / "models"
-OUTPUT_DIR = PROJECT_DIR.parent / "outputs" / "reports"
+DATA_FILE = PROJECT_DIR / "data" / "accidents.csv"
+MODEL_DIR = PROJECT_DIR / "models"
+OUTPUT_DIR = PROJECT_DIR / "outputs" / "reports"
 
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -29,7 +29,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 if not DATA_FILE.exists():
     raise FileNotFoundError(
         f"Dataset not found: {DATA_FILE}\n"
-        "Check that accidents.csv is inside MINI_PROJECT/data."
+        "Check that accidents.csv is inside this project's data folder."
     )
 
 df = pd.read_csv(DATA_FILE)

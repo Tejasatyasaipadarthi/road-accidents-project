@@ -1,11 +1,12 @@
 import pandas as pd
 from pathlib import Path
 
-DATA_FILE = Path("../data/accidents.csv")
+PROJECT_DIR = Path(__file__).resolve().parent
+DATA_FILE = PROJECT_DIR / "data" / "accidents.csv"
 
 if not DATA_FILE.exists():
     print(f"ERROR: Dataset not found at {DATA_FILE}")
-    print("Check the filename and place your CSV file inside the data folder.")
+    print("Check that accidents.csv is inside this project's data folder.")
     raise SystemExit(1)
 
 try:
